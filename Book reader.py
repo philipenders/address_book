@@ -3,24 +3,38 @@ import csv
 
 # test database 'address_book_one.csv'
 
+"""
+The Book class takes a filename at creation, opens that file and then reads it into a list. Each item in that list is 
+then converted to an Entry class object. Book ultimately is an object that holds entry objects in self.data. 
+"""
 class Book:
     def __init__(self, filename='address_book_one.csv'):
+        #not sure if filename ever needs to be used later, but it feels better to write this out.
         self.filename = filename
-        data = []
-        with open(self.filename, 'rwbU') as csvfile:
+        #This empty list will be filled with list items
+        self.data = []
+        #opens "self.filename" in read only format in Universal newline mode.
+        with open(self.filename, 'rbU') as csvfile:
             my_csv = csv.reader(csvfile, delimiter=',', quotechar='|')
-            for value, row in enumerate(my_csv):
-                data.append(row)
+            for row in my_csv:
+                self.data.append(row)
 
-        self.headline = {0 : 'First_Name', 1: 'Last_Name', 2:'Street_Address', 3:'City', 4: 'State', 5:'Zip', 6:'Phone_Number', 7:'Email'}
-        self.data = data
+        #At this point data is a list of list objects read from the original file
 
+        #self.headline isn't useful yet, but it will be when I impliment looking up specific data about an entry.
+        """
+        self.headline = {0 : 'First_Name', 1: 'Last_Name', 2:'Street_Address', 3:'City', 4: 'State', 5:'Zip', 
+        6:'Phone_Number', 7:'Email'}
+        """
+        #The below process converts each list within self.data into an Entry object.
         entries = []
         for line_of_data in self.data:
             this_entry = Entry(line_of_data)
             entries.append(this_entry)
         self.data = entries
 
+
+    #unsurprisingly, this updates the file with any changes that have been made to the active Book
     def update_book(self):
         with open(self.filename, 'wb') as csvfile:
             my_csv = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -28,7 +42,9 @@ class Book:
             for value in range(len(self.data)):
                 my_csv.writerow((self.data[value]).Raw_Entry)
 
+    #This adds a new contact to the currently active Book
     def add_contact(self):
+        #collects the necissary information for the entry object
         f_n = raw_input("Enter First Name: ")
         l_n = raw_input("Enter Last Name: ")
         full_ad = raw_input("Enter Street Address: ")
@@ -37,8 +53,11 @@ class Book:
         zipcode = raw_input("Enter Zip Code: ")
         telep = raw_input("Enter Phone Number: ")
         email = raw_input("Enter e-mail: ")
+        #puts all of the above datapoints in the right order
         data_entry = [f_n, l_n, full_ad, city, state, zipcode, telep, email]
+        #converts the new information into an Entry object
         entry_to_add = Entry(data_entry)
+        #adds the Entry object to the currently active Book.
         self.data.append(entry_to_add)
 
 
@@ -56,6 +75,7 @@ class Entry:
         self.Full_Address = self.Street_Address + " " + self.City + ", " + self.State + " " + self.Zip
         self.Full_Name = self.First_Name + " " + self.Last_Name
         self.Contact_Info = [self.Phone_Number, self.Email]
+
     def __repr__(self):
         return str(self.Raw_Entry)
 
