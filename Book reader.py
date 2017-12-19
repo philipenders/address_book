@@ -3,8 +3,9 @@ import csv
 # test database 'address_book_one.csv'
 
 """
-The Book class takes a filename at creation, opens that file and then reads it into a list. Each item in that list is 
-then converted to an Entry class object. Book ultimately is an object that holds entry objects in self.data. 
+The Book class takes a filename at creation, opens that file and then reads it into a list.
+Each item in that list is then converted to an Entry class object.
+Book ultimately is an object that holds entry objects in self.data. 
 """
 
 
@@ -20,10 +21,12 @@ class Book:
             for row in my_csv:
                 self.data.append(row)
 
-        # At this point data is a list of list objects read from the original file
+        # At this point self.data is a list of list objects read from the original file
 
-        # self.headline isn't useful yet, but it will be when I impliment looking up specific data about an entry.
-        # self.headline = {0 : 'First_Name', 1: 'Last_Name', 2:'Street_Address', 3:'City', 4: 'State', 5:'Zip', 6:'Phone_Number', 7:'Email'}
+        # self.headline isn't useful yet, but it will be when I implement
+        # looking up specific data about an entry.
+        # self.headline = {0 : 'First_Name', 1: 'Last_Name', 2:'Street_Address',
+        # 3:'City', 4: 'State', 5:'Zip', 6:'Phone_Number', 7:'Email'}
 
         # The below process converts each list within self.data into an Entry object.
         entries = []
@@ -58,17 +61,28 @@ class Book:
         # adds the Entry object to the currently active Book.
         self.data.append(entry_to_add)
 
+    """
+    address_from_full name allows the user to enter a First_Name Last_Name.
+    it returns the Address information for a given contact from their Entry Object   
+    """
     def address_from_full_name(self):
-        search_term = input("Please Enter the Full Name of the desired Contact")
+        search_term = raw_input("Please Enter the Full Name of the desired Contact")
         found = True
+        #simply loops through the self.data list of Entry(s)
         for datapoint in self.data:
             found = False
+            #if an entry item matches the Full_Name variable for a given entry...
             if datapoint.Full_Name == search_term:
+                print("Data found Address follows: ")
                 print datapoint.Full_Address
+                print("")
                 found = True
                 break
+        #If we don't find them in the directory, we tell the user.
+        # TODO impliment an ask for the user "Do you want to add someone to the directory"
         if found == False:
             print("error, no such name found. Returning to Main Menu.")
+            print("")
 
 
 # The entry class objects make up Book objects and contain a parsed version of the data from the csv file.
