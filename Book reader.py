@@ -9,11 +9,12 @@ Book ultimately is an object that holds entry objects in self.data.
 """
 
 
+# The book class interfaces with the csv file
 class Book:
     def __init__(self, filename='address_book_one.csv'):
-        # not sure if filename ever needs to be used later, but it feels better to write this out.
+        # It feels better to have filename be part of the book class
         self.filename = filename
-        # This empty list will be filled with list items
+        # This empty list will be filled with list objects initially
         self.data = []
         # opens "self.filename" in read only format in Universal newline mode.
         with open(self.filename, 'rbU') as csvfile:
@@ -22,11 +23,6 @@ class Book:
                 self.data.append(row)
 
         # At this point self.data is a list of list objects read from the original file
-
-        # self.headline isn't useful yet, but it will be when I implement
-        # looking up specific data about an entry.
-        # self.headline = {0 : 'First_Name', 1: 'Last_Name', 2:'Street_Address',
-        # 3:'City', 4: 'State', 5:'Zip', 6:'Phone_Number', 7:'Email'}
 
         # The below process converts each list within self.data into an Entry object.
         entries = []
@@ -43,49 +39,8 @@ class Book:
             for value in range(len(self.data)):
                 my_csv.writerow((self.data[value]).Raw_Entry)
 
-    # This adds a new contact to the currently active Book
-    def add_contact(self):
-        # collects the necissary information for the entry object
-        f_n = raw_input("Enter First Name: ")
-        l_n = raw_input("Enter Last Name: ")
-        full_ad = raw_input("Enter Street Address: ")
-        city = raw_input("Enter City: ")
-        state = raw_input("Enter State: ")
-        zipcode = raw_input("Enter Zip Code: ")
-        telep = raw_input("Enter Phone Number: ")
-        email = raw_input("Enter e-mail: ")
-        # puts all of the above datapoints in the right order
-        data_entry = [f_n, l_n, full_ad, city, state, zipcode, telep, email]
-        # converts the new information into an Entry object
-        entry_to_add = Entry(data_entry)
-        # adds the Entry object to the currently active Book.
-        self.data.append(entry_to_add)
 
-    """
-    address_from_full name allows the user to enter a First_Name Last_Name.
-    it returns the Address information for a given contact from their Entry Object   
-    """
-    def address_from_full_name(self):
-        search_term = raw_input("Please Enter the Full Name of the desired Contact")
-        found = True
-        #simply loops through the self.data list of Entry(s)
-        for datapoint in self.data:
-            found = False
-            #if an entry item matches the Full_Name variable for a given entry...
-            if datapoint.Full_Name == search_term:
-                print("Data found Address follows: ")
-                print datapoint.Full_Address
-                print("")
-                found = True
-                break
-        #If we don't find them in the directory, we tell the user.
-        # TODO impliment an ask for the user "Do you want to add someone to the directory"
-        if found == False:
-            print("error, no such name found. Returning to Main Menu.")
-            print("")
-
-
-# The entry class objects make up Book objects and contain a parsed version of the data from the csv file.
+# The entry class objects make up Book objects and contain a line of data from the csv
 class Entry:
     def __init__(self, data_line):
         self.Raw_Entry = data_line
@@ -106,45 +61,128 @@ class Entry:
     def __repr__(self):
         return str(self.Raw_Entry)
 
+    # The following three methods check if certain input information matches the Entry
+    def does_match_full_name(self, full_name):
+        return (self.Full_Name == full_name)
 
-# I have this outside of the body of the program for testing purposes.
-def mainloop():
-    invalid_entry_count = 0
-    while True:
-        if invalid_entry_count > 3:
-            print("I'm sorry, there appears to be an unspecified error between the keyboard and chair.")
-            break
-        print("Please select an option.")
-        print("1. list contacts and contact information.")
-        print("2. add a contact to the directory.")
-        print("3. find an address given a full name.")
-        print("4. Exit")
+    def does_match_zip(self, zip):
+        return (self.Zip == zip)
 
-        choice = raw_input("Please enter a number corresponding to your choice: ")
-        if choice == '1':
-            for entry in mybook.data:
-                print entry
+    def does_match_state(self, state):
+        return (self.State == state)
+
+
+# _______________________________________
+
+# The address book UI contains all control options for the Address Book.
+
+class AddressBookUI():
+    def __init__(self, name="Default UI"):
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+
+    def read_fullbook(self, book_in_question):
+        for entry in book_in_question.data:
+            print entry
+            print("")
+
+    # This adds a new contact to the currently active Book
+    def add_contact_to_book(self, book_in_question):
+        # collects the necissary information for the entry object
+        f_n = raw_input("Enter First Name: ")
+        l_n = raw_input("Enter Last Name: ")
+        full_ad = raw_input("Enter Street Address: ")
+        city = raw_input("Enter City: ")
+        state = raw_input("Enter State: ")
+        zipcode = raw_input("Enter Zip Code: ")
+        telep = raw_input("Enter Phone Number: ")
+        email = raw_input("Enter e-mail: ")
+        # puts all of the above datapoints in the right order
+        data_entry = [f_n, l_n, full_ad, city, state, zipcode, telep, email]
+        # converts the new information into an Entry object
+        entry_to_add = Entry(data_entry)
+        # adds the Entry object to the currently active Book.
+        book_in_question.data.append(entry_to_add)
+        print("Directory updated")
+
+    def find_address_from_full_name(self, book_in_question):
+        search_term = raw_input("Please Enter the Full Name of the desired Contact")
+        match_count = 0
+        for Entry in book_in_question.data:
+            if Entry.does_match_full_name(search_term):
+                print Entry.Full_Address
+                match_count += 1
+        if match_count == 0:
+            print ("I'm sorry, no matches found for '" + search_term + "'")
+            return False, search_term
+        return True, search_term
+
+    def load_book(self, book_title='address_book_one.csv'):
+        return Book(book_title)
+
+    def quitting(self):
+        print("")
+        print ("Now closing program")
+        print("...")
+        print("Quitting")
+        print("...")
+        print("")
+
+    def main_UI(self):
+        print("Thanks for taking a look at this project. It's very simple right now, "
+              "with limited function.")
+        print("The idea is to create an updatable book of contacts in a csv file.")
+        print("....")
+        print("")
+
+        print("Welcome to the program, I appreciate you trying out my address book.")
+        current_book = self.load_book()
+        invalid_entry_count = 0
+        while True:
+            if invalid_entry_count > 3:
+                print("I'm sorry, there appears to be an unspecified error between the keyboard and chair.")
+                break
+            print("Please select an option.")
+            print("1. list contacts and contact information.")
+            print("2. add a contact to the directory.")
+            print("3. find an address given a full name.")
+            print("4. Exit")
+
+            choice = raw_input("Please enter a number corresponding to your choice: ")
+            if choice == '1':
+                self.read_fullbook(current_book)
+            elif choice == '2':
+                self.add_contact_to_book(current_book)
+                # current_book.update_book()
+
+
+            elif choice == '3':
+                found, full_name = self.find_address_from_full_name(current_book)
+                if not found:
+                    selection = raw_input("Would you like to add their information to the directory?,"
+                                          "enter '1' for 'yes'. alternatively enter '2' for 'no'.")
+                    if selection == '1':
+                        self.add_contact_to_book(current_book)
+                    if selection == '2':
+                        print ("Alright! So sorry we couldn't find that person in the directory.")
                 print("")
-        elif choice == '2':
-            mybook.add_contact()
-            mybook.update_book()
-            print("Directory updated")
-        elif choice == '3':
-            mybook.address_from_full_name()
 
-        elif choice == '4':
-            print("Quitting...")
-            break
-        else:
-            print("Invalid Entry. Please try Again.")
-            print(" ")
-            invalid_entry_count += 1
-
-    print("Thank you for using the directory. Goodbye.")
+            elif choice == '4':
+                self.quitting()
+                break
 
 
-mybook = Book()
-print("Thanks for taking a look at this project. It's very simple right now. Very basic UI.")
-print("The idea is to create an updatable book of contacts in a csv file.")
+            else:
+                print("Invalid Entry. Please try Again.")
+                print(" ")
+                invalid_entry_count += 1
 
-mainloop()
+        print("Thank you for using the directory. Goodbye.")
+
+
+
+AB_UI = AddressBookUI('AB_UI')
+
+AB_UI.main_UI()
