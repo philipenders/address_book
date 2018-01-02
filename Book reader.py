@@ -123,8 +123,8 @@ class AddressBookUI():
         search_term = raw_input("Please Enter the zip code you'd like to search for")
         match_count = 0
         for entry in book_in_question.data:
-            if Entry.does_match_zip(search_term):
-                print (Entry.Full_Name + " at : " + str(Entry.Full_Address))
+            if entry.does_match_zip(search_term):
+                print (entry.Full_Name + " at : " + str(entry.Full_Address))
                 match_count +=1
         if match_count ==0:
             return match_count, search_term
@@ -188,8 +188,10 @@ class AddressBookUI():
             elif choice == '4':
                 number_of_matches, returned_zip = self.find_all_names_in_zip(current_book)
                 if number_of_matches ==0:
+                    print("")
                     print ("I'm sorry, no matches found for '" + returned_zip+ "'")
                 else:
+                    print("")
                     print(str(number_of_matches) + " found in zip code: " + str(returned_zip))
                 print("")
 
