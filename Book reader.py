@@ -82,7 +82,7 @@ class AddressBookUI():
 
     def __repr__(self):
         return self.name
-
+    #this function takes the "book_in_question", and prints each entry in the directory
     def read_fullbook(self, book_in_question):
         for entry in book_in_question.data:
             print entry
@@ -105,7 +105,18 @@ class AddressBookUI():
         entry_to_add = Entry(data_entry)
         # adds the Entry object to the currently active Book.
         book_in_question.data.append(entry_to_add)
-        print("Directory updated")
+        yes_or_no = raw_input("Do you want to save changes to the csv file? please enter 'y' or 'n'")
+        yes_or_no = yes_or_no.upper()
+        if yes_or_no =='Y':
+            book_in_question.update_book()
+            print("Understood, csv file updated.")
+        elif yes_or_no =='N':
+            print("Understood, I'll hold off on updating the csv file.")
+        else:
+            print("I'm sorry, i didn't understand the input. If you want to save to the csv, "
+                  "please select 'U' as your choice in the main menu")
+        print("")
+        print("Working Directory Updated")
 
     def find_address_from_full_name(self, book_in_question):
         search_term = raw_input("Please Enter the Full Name of the desired Contact")
@@ -161,6 +172,7 @@ class AddressBookUI():
             print("3. find an address given a full name.")
             print("4. find all contacts in a zip code.")
             print("5. Exit")
+            print("U. update the csv file for the current book.")
 
             choice = raw_input("Please enter a number corresponding to your choice: ")
             if choice == '1':
@@ -201,6 +213,17 @@ class AddressBookUI():
                 self.quitting()
                 break
 
+            elif choice == 'u' or "U":
+                yes_or_no = raw_input("Do you want to save changes to the csv file? please enter 'y' or 'n'")
+                yes_or_no = yes_or_no.upper()
+                if yes_or_no == 'Y':
+                    current_book.update_book()
+                    print("Understood, csv file updated.")
+                elif yes_or_no == 'N':
+                    print("Understood, I'll hold off on updating the csv file.")
+                else:
+                    print("I'm sorry, i didn't understand the input. exiting saving menu")
+                print("")
 
             else:
                 print("Invalid Entry. Please try Again.")
