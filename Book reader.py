@@ -119,6 +119,17 @@ class AddressBookUI():
             return False, search_term
         return True, search_term
 
+    def find_all_names_in_zip(self, book_in_question):
+        search_term = raw_input("Please Enter the zip code you'd like to search for")
+        match_count = 0
+        for entry in book_in_question.data:
+            if Entry.does_match_zip(search_term):
+                print (Entry.Full_Name + " at : " + str(Entry.Full_Address))
+                match_count +=1
+        if match_count ==0:
+            return match_count, search_term
+        return match_count, search_term
+
     def load_book(self, book_title='address_book_one.csv'):
         return Book(book_title)
 
@@ -148,16 +159,20 @@ class AddressBookUI():
             print("1. list contacts and contact information.")
             print("2. add a contact to the directory.")
             print("3. find an address given a full name.")
-            print("4. Exit")
+            print("4. find all contacts in a zip code.")
+            print("5. Exit")
 
             choice = raw_input("Please enter a number corresponding to your choice: ")
             if choice == '1':
                 self.read_fullbook(current_book)
+
+            #Adds a contact to current_book and updates the csv file when uncommented
             elif choice == '2':
                 self.add_contact_to_book(current_book)
-                # current_book.update_book()
+                # current_book.update_book() #<--remove this in a live program to actually update the book
 
-
+            #let's the user search the address book and add a contact if there is no match
+            #TODO add functionality so users don't have to re-enter the name once typed.
             elif choice == '3':
                 found, full_name = self.find_address_from_full_name(current_book)
                 if not found:
@@ -169,7 +184,18 @@ class AddressBookUI():
                         print ("Alright! So sorry we couldn't find that person in the directory.")
                 print("")
 
+            #choice four should let a user print any matching contacts to the screen
             elif choice == '4':
+                number_of_matches, returned_zip = self.find_all_names_in_zip(current_book)
+                if number_of_matches ==0:
+                    print ("I'm sorry, no matches found for '" + returned_zip+ "'")
+                else:
+                    print(str(number_of_matches) + " found in zip code: " + str(returned_zip))
+                print("")
+
+
+            #calls the quitting() method to provide exit scripting
+            elif choice == '5':
                 self.quitting()
                 break
 
